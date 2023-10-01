@@ -1,26 +1,28 @@
-const Task = require('../models/Task');
+const Task = require("../models/Task");
 
 // Create a new task
 exports.createTask = async (req, res) => {
   try {
+    const user = req.userId;
     const { title, description, deadline } = req.body;
-    const task = new Task({ title, description, deadline });
+    const task = new Task({ title, description, deadline, user });
     await task.save();
     res.status(201).json(task);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: 'Could not create task' });
+    res.status(500).json({ error: "Could not create task" });
   }
 };
 
 // Get a list of all tasks
 exports.getAllTasks = async (req, res) => {
   try {
-    const tasks = await Task.find();
+    const userId = req.userId; // Get the user ID from the logged-in user
+    const tasks = await Task.find({ user: userId }); // Filter tasks by user ID
     res.status(200).json(tasks);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: 'Could not retrieve tasks' });
+    res.status(500).json({ error: "Could not retrieve tasks" });
   }
 };
 
@@ -30,12 +32,12 @@ exports.getTaskById = async (req, res) => {
     const taskId = req.params.id;
     const task = await Task.findById(taskId);
     if (!task) {
-      return res.status(404).json({ error: 'Task not found' });
+      return res.status(404).json({ error: "Task not found" });
     }
     res.status(200).json(task);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: 'Could not retrieve task' });
+    res.status(500).json({ error: "Could not retrieve task" });
   }
 };
 
@@ -44,14 +46,18 @@ exports.updateTask = async (req, res) => {
   try {
     const taskId = req.params.id;
     const { title, description, deadline } = req.body;
-    const updatedTask = await Task.findByIdAndUpdate(taskId, { title, description, deadline }, { new: true });
+    const updatedTask = await Task.findByIdAndUpdate(
+      taskId,
+      { title, description, deadline },
+      { new: true }
+    );
     if (!updatedTask) {
-      return res.status(404).json({ error: 'Task not found' });
+      return res.status(404).json({ error: "Task not found" });
     }
     res.status(200).json(updatedTask);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: 'Could not update task' });
+    res.status(500).json({ error: "Could not update task" });
   }
 };
 
@@ -61,11 +67,11 @@ exports.deleteTask = async (req, res) => {
     const taskId = req.params.id;
     const deletedTask = await Task.findByIdAndDelete(taskId);
     if (!deletedTask) {
-      return res.status(404).json({ error: 'Task not found' });
+      return res.status(404).json({ error: "Task not found" });
     }
-    res.status(204).send(); 
+    res.status(204).send();
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: 'Could not delete task' });
+    res.status(500).json({ error: "Could not delete task" });
   }
 };

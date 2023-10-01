@@ -6,7 +6,7 @@ const verifyToken = require("../middleware/verifyToken");
 router.post("/", verifyToken, taskController.createTask);
 
 // Get a list of all tasks
-router.get("/", taskController.getAllTasks);
+router.get("/", verifyToken, taskController.getAllTasks);
 
 // Get a specific task by ID
 router.get("/:id", taskController.getTaskById);
